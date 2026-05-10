@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { Star } from 'lucide-react';
+import { Star } from "lucide-react";
+import { JSX } from "react";
 
 interface Statistic {
   label: string;
@@ -17,43 +18,43 @@ interface Review {
 
 const statistics: Statistic[] = [
   {
-    label: 'Workouts Logged',
-    value: '10,000+',
-    description: 'Training sessions completed by our community',
+    label: "Workouts Logged",
+    value: "10,000+",
+    description: "Training sessions completed by our community",
   },
   {
-    label: 'Active Athletes',
-    value: '500+',
-    description: 'Growing community of dedicated fitness enthusiasts',
+    label: "Active Athletes",
+    value: "500+",
+    description: "Growing community of dedicated fitness enthusiasts",
   },
   {
-    label: 'Satisfaction Rate',
-    value: '98%',
-    description: 'Users would recommend ATLAS to a friend',
+    label: "Satisfaction Rate",
+    value: "98%",
+    description: "Users would recommend ATLAS to a friend",
   },
 ];
 
 const reviews: Review[] = [
   {
-    name: 'Alex Rodriguez',
-    role: 'Professional Athlete',
+    name: "Alex Rodriguez",
+    role: "Professional Athlete",
     content:
-      'ATLAS transformed how I train. The AI-powered programming is spot-on, and tracking my biometrics in real-time has taken my performance to the next level. Absolutely game-changing.',
-    avatar: '🏃',
+      "ATLAS transformed how I train. The AI-powered programming is spot-on, and tracking my biometrics in real-time has taken my performance to the next level. Absolutely game-changing.",
+    avatar: "🏃",
   },
   {
-    name: 'Sarah Chen',
-    role: 'Strength Coach',
+    name: "Sarah Chen",
+    role: "Strength Coach",
     content:
-      'Managing multiple athletes used to be chaotic. Now with ATLAS, I can track everyone\'s progress, adjust programs on the fly, and communicate seamlessly. Best investment for my coaching business.',
-    avatar: '💪',
+      "Managing multiple athletes used to be chaotic. Now with ATLAS, I can track everyone's progress, adjust programs on the fly, and communicate seamlessly. Best investment for my coaching business.",
+    avatar: "💪",
   },
   {
-    name: 'Marcus Williams',
-    role: 'Fitness Enthusiast',
+    name: "Marcus Williams",
+    role: "Fitness Enthusiast",
     content:
-      'I love how ATLAS adapts to my fitness journey. The form feedback keeps me honest, and the progress visualization is incredibly motivating. This is the platform I\'ve been waiting for.',
-    avatar: '⭐',
+      "I love how ATLAS adapts to my fitness journey. The form feedback keeps me honest, and the progress visualization is incredibly motivating. This is the platform I've been waiting for.",
+    avatar: "⭐",
   },
 ];
 
@@ -70,7 +71,7 @@ export default function SocialProofSection(): JSX.Element {
         {/* Section Header */}
         <div className="mb-20 text-center">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Trusted by the{' '}
+            Trusted by the{" "}
             <span className="bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text">
               Performance Community
             </span>
@@ -93,7 +94,9 @@ export default function SocialProofSection(): JSX.Element {
               <div className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text mb-3">
                 {stat.value}
               </div>
-              <div className="text-xl font-semibold text-white mb-2">{stat.label}</div>
+              <div className="text-xl font-semibold text-white mb-2">
+                {stat.label}
+              </div>
               <div className="text-sm text-slate-400">{stat.description}</div>
             </div>
           ))}
@@ -101,7 +104,9 @@ export default function SocialProofSection(): JSX.Element {
 
         {/* Testimonials */}
         <div className="mb-12">
-          <h3 className="text-2xl font-bold text-white mb-8 text-center">What Users Say</h3>
+          <h3 className="text-2xl font-bold text-white mb-8 text-center">
+            What Users Say
+          </h3>
 
           <div className="grid md:grid-cols-3 gap-6">
             {reviews.map((review, index) => (
@@ -130,7 +135,9 @@ export default function SocialProofSection(): JSX.Element {
                     {review.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-white">{review.name}</div>
+                    <div className="font-semibold text-white">
+                      {review.name}
+                    </div>
                     <div className="text-xs text-slate-400">{review.role}</div>
                   </div>
                 </div>
@@ -142,7 +149,8 @@ export default function SocialProofSection(): JSX.Element {
         {/* Bottom Trust Badge */}
         <div className="text-center pt-12 border-t border-slate-800/50">
           <p className="text-slate-400 text-sm">
-            Backed by thousands of verified user sessions and real performance results
+            Backed by thousands of verified user sessions and real performance
+            results
           </p>
         </div>
       </div>

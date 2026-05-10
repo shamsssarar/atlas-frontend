@@ -1,6 +1,7 @@
 'use client';
 
 import { Zap, Activity, Share2 } from 'lucide-react';
+import { JSX } from 'react';
 
 interface FeatureCard {
   icon: React.ReactNode;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { Users, BarChart3, Zap } from 'lucide-react';
 
 type Role = 'athlete' | 'coach';

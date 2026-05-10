@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { JSX } from 'react';
 
 export default function FinalCTASection(): JSX.Element {
   return (
