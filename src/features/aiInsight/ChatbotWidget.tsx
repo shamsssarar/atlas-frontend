@@ -52,15 +52,20 @@ export default function ChatbotWidget() {
 
     try {
       const response = await askCoach({ question: inputValue }).unwrap();
+
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "ai",
-        text: response.response || "I couldn't process that. Please try again.",
+        // Change this line right here!
+        text:
+          response.data?.answer || "I couldn't process that. Please try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error("Chat error:", error);
+      const err = error as any;
+
+      console.error("Chat error details:", err?.data || err?.message || err);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "ai",

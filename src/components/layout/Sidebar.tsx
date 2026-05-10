@@ -8,15 +8,17 @@ import { logOut } from "@/features/auth/authSlice";
 import { RootState } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Dumbbell, Activity, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
   const authState = useSelector((state: RootState) => state.auth);
-
+  const router = useRouter();
   const handleLogout = async () => {
     try {
       await signOut(auth);
       dispatch(logOut());
+      router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }

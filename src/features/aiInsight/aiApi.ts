@@ -3,11 +3,14 @@ import { baseApi } from "@/store/baseApi";
 export const aiApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getInsights: builder.query<any, void>({
-      query: () => "/insights",
+      query: () => "/aiInsights",
     }),
-    askCoach: builder.mutation<{ response: string }, { question: string }>({
+    askCoach: builder.mutation<
+      { success: boolean; data: { answer: string } },
+      { question: string }
+    >({
       query: (payload) => ({
-        url: "/chatbot/ask",
+        url: "/ragChatbot/ask",
         method: "POST",
         body: payload,
       }),

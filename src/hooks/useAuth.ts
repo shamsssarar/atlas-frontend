@@ -2,24 +2,34 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { setUser, logout } from '@/features/auth/authSlice';
+import { setCredentials, logOut } from '@/features/auth/authSlice';
 import { RootState } from '@/store/store';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const authState = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        dispatch(setUser({ uid: firebaseUser.uid, email: firebaseUser.email }));
+        dispatch(setCredentials({ 
+          uid: firebaseUser.uid, 
+          email: firebaseUser.email || '' 
+        }));
       } else {
-        dispatch(logout());
+        dispatch(logOut());
       }
     });
 
     return () => unsubscribe();
   }, [dispatch]);
 
-  return { user, isAuthenticated };
+  const user = authState.uid ? {
+    uid: authState.uid,
+    email: authState.email,
+    role: authState.role,
+  } : null;
+
+  return { user, ...authState };
 };
+
