@@ -19,6 +19,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Biometrics"],
+  tagTypes: ["Biometrics", "Programs"],
   endpoints: () => ({}),
 });
