@@ -1,12 +1,26 @@
-import { baseApi } from '@/store/baseApi';
+import { baseApi } from "@/store/baseApi";
 
 export const biometricsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBiometrics: builder.query<any, void>({
-      query: () => '/biometrics',
+    getBiometricsHistory: builder.query({
+      query: (days = 7) => `/biometrics?days=${days}`,
+      providesTags: ["Biometrics"],
+    }),
+
+    // ADD THIS NEW MUTATION
+    logBiometrics: builder.mutation({
+      query: (payload) => ({
+        url: "/biometrics",
+        method: "POST",
+        body: payload,
+      }),
+      // THE MAGIC: This tells Redux to instantly refetch the history query above!
+      invalidatesTags: ["Biometrics"],
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
-export const { useGetBiometricsQuery } = biometricsApi;
+// Notice we added the new useLogBiometricsMutation hook here
+export const { useGetBiometricsHistoryQuery, useLogBiometricsMutation } =
+  biometricsApi;
