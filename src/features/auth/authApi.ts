@@ -1,8 +1,15 @@
 import { baseApi } from '@/store/baseApi';
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  role: 'ATHLETE' | 'COACH' | 'ADMIN';
+  [key: string]: any;
+}
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUserProfile: builder.query<unknown, void>({
+    getUserProfile: builder.query<UserProfile, void>({
       query: () => '/auth/profile',
     }),
     syncUser: builder.mutation<unknown, { name: string; email: string }>({
@@ -16,4 +23,4 @@ export const authApi = baseApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useGetUserProfileQuery, useSyncUserMutation } = authApi;
+export const { useGetUserProfileQuery, useLazyGetUserProfileQuery, useSyncUserMutation } = authApi;

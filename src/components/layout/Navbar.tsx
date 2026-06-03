@@ -13,13 +13,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, X, User, Settings, HelpCircle, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
-  const authState = useSelector((state: RootState) => state.auth);
+  const authState = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
   const isPublic =
     pathname === "/" ||
     pathname?.startsWith("/login") ||
@@ -45,6 +50,15 @@ export default function Navbar() {
     { label: "Training Plans", href: "/training-plans" },
     { label: "Pricing", href: "/#pricing" },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <nav
@@ -131,14 +145,25 @@ export default function Navbar() {
                     <p className="text-sm font-medium text-white">
                       {authState.email || "User"}
                     </p>
-                    <p className="text-xs text-slate-400">
-                      {authState.role || "Athlete"}
-                    </p>
+                    <p className="text-xs text-slate-400">{authState.role}</p>
                   </div>
                   <DropdownMenuSeparator className="bg-slate-800" />
-                  <DropdownMenuItem className="cursor-pointer text-slate-300 hover:text-white hover:bg-slate-800">
-                    <User className="w-4 h-4 mr-2" />
-                    <span>Profile</span>
+                  <DropdownMenuItem
+                    asChild
+                    className="cursor-pointer text-slate-300 hover:text-white hover:bg-slate-800"
+                  >
+                    <Link
+                      href={
+                        authState.role === "COACH"
+                          ? "/coach"
+                          : authState.role === "ADMIN"
+                            ? "/admin"
+                            : "/athlete"
+                      }
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      <span>Dashboard</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer text-slate-300 hover:text-white hover:bg-slate-800">
                     <Settings className="w-4 h-4 mr-2" />
@@ -149,7 +174,10 @@ export default function Navbar() {
                     <span>Help & Support</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-slate-800" />
-                  <DropdownMenuItem className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-slate-800">
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-slate-800"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="w-4 h-4 mr-2" />
                     <span>Logout</span>
                   </DropdownMenuItem>

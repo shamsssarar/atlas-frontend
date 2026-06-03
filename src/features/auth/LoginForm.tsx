@@ -6,12 +6,19 @@ import { auth } from "@/lib/firebase";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "./authSlice";
 import { useRouter } from "next/navigation";
+import { useLazyGetUserProfileQuery, useSyncUserMutation } from "./authApi";
 
 // shadcn UI components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -21,6 +28,8 @@ export function LoginForm() {
 
   const dispatch = useDispatch();
   const router = useRouter();
+  const [getProfile] = useLazyGetUserProfileQuery();
+  const [syncUser] = useSyncUserMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,23 +38,48 @@ export function LoginForm() {
 
     try {
       // 1. Authenticate with Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
 
-      // 2. Save user to Redux Global State
+      // 2. Call RTK Query backend mutation to create PostgreSQL record)
+
+      await user.getIdToken(true);
+
+      const dbResponse = (await syncUser({
+        name: user.displayName || "User",
+        email: user.email || email,
+      }).unwrap()) as any;
+
+      const role = dbResponse?.data?.role || dbResponse?.role || "ATHLETE";
+      console.log("Extracted Role:", role);
+
+      // 3. Save user to Redux Global State
       dispatch(
         setCredentials({
           uid: user.uid,
           email: user.email || "",
-        })
+          role,
+        }),
       );
 
-      // 3. Redirect to the Dashboard
-      router.push("/athlete"); 
-
+      // 4. Redirect based on role
+      if (role === "COACH") {
+        router.push("/coach");
+      } else if (role === "ADMIN") {
+        router.push("/admin"); // Assuming you have an admin route, or fallback
+      } else {
+        router.push("/athlete");
+      }
     } catch (err: any) {
-      console.error("Login failed:", err);
-      setError("Invalid email or password. Please try again.");
+      // 🐛 UNHIDE THE ERROR: Extract the actual message from RTK Query or Firebase
+      const realError =
+        err?.data?.message || err?.error || err?.message || JSON.stringify(err);
+      console.error("Login failed:", realError);
+      setError(`Login Error: ${realError}`);
     } finally {
       setIsLoading(false);
     }
@@ -54,8 +88,12 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg border-primary/10">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Welcome Back</CardTitle>
-        <CardDescription>Enter your credentials to access your training dashboard.</CardDescription>
+        <CardTitle className="text-2xl font-bold tracking-tight">
+          Welcome Back
+        </CardTitle>
+        <CardDescription>
+          Enter your credentials to access your training dashboard.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleLogin} className="space-y-4">
@@ -80,8 +118,10 @@ export function LoginForm() {
               required
             />
           </div>
-          
-          {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+
+          {error && (
+            <p className="text-sm text-destructive font-medium">{error}</p>
+          )}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Authenticating..." : "Sign In"}

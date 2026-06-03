@@ -7,13 +7,22 @@ import { auth } from "@/lib/firebase";
 import { logOut } from "@/features/auth/authSlice";
 import { RootState } from "@/store/store";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Dumbbell, Activity, LogOut } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Dumbbell, 
+  Activity, 
+  LogOut,
+  ClipboardList,
+  Users,
+  ShieldAlert
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
   const authState = useSelector((state: RootState) => state.auth);
   const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -24,11 +33,28 @@ export default function Sidebar() {
     }
   };
 
-  const navItems = [
+  const athleteNav = [
     { name: "Dashboard", href: "/athlete", icon: LayoutDashboard },
     { name: "Workouts", href: "/athlete/workouts", icon: Dumbbell },
     { name: "Biometrics", href: "/athlete/biometrics", icon: Activity },
   ];
+
+  const coachNav = [
+    { name: "Dashboard", href: "/coach", icon: LayoutDashboard },
+    { name: "Programs & Targets", href: "/coach/programs", icon: ClipboardList },
+    { name: "My Athletes", href: "/coach/my-athletes", icon: Users },
+  ];
+
+  const adminNav = [
+    { name: "System Dashboard", href: "/admin", icon: ShieldAlert },
+  ];
+
+  let navItems = athleteNav; // Default
+  if (authState.role === "COACH") {
+    navItems = coachNav;
+  } else if (authState.role === "ADMIN") {
+    navItems = adminNav;
+  }
 
   return (
     <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen border-r border-slate-700">
@@ -59,8 +85,10 @@ export default function Sidebar() {
 
       {/* User Info & Logout */}
       <div className="p-4 border-t border-slate-700 space-y-4">
-        <div className="px-4 py-2 bg-slate-800 rounded-lg">
-          <p className="text-xs text-slate-400">Logged in as</p>
+        <div className="px-4 py-2 bg-slate-800 rounded-lg flex flex-col gap-1">
+          <p className="text-xs text-slate-400 font-medium">
+            Logged in as {authState.role || "ATHLETE"}
+          </p>
           <p className="text-sm font-medium text-white truncate">
             {authState.email || "User"}
           </p>
