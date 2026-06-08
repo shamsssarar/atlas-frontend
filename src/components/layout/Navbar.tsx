@@ -31,6 +31,9 @@ export default function Navbar() {
     pathname?.startsWith("/register") ||
     pathname?.startsWith("/training-plans");
 
+  const isAuthRoute =
+    pathname?.startsWith("/login") || pathname?.startsWith("/register");
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -123,7 +126,7 @@ export default function Navbar() {
             )}
 
             {/* User Dropdown for Authenticated */}
-            {authState.email && (
+            {authState.email && !isAuthRoute && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="rounded-full hover:ring-2 hover:ring-blue-400/50 p-1 transition-all duration-300">

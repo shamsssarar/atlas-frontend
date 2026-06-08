@@ -5,14 +5,13 @@ import ChatbotWidget from "@/features/aiInsight/ChatbotWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { usePathname, notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth"; // ✅ Import our custom hook
+import { useAuth } from "@/hooks/useAuth"; 
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // ✅ Extract role, auth status, AND loading status from the hook
   const { role, isAuthenticated, isAuthLoading } = useAuth();
   
   const pathname = usePathname();
@@ -22,6 +21,14 @@ export default function DashboardLayout({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 🛠️ THE FIX: Handle routing safely inside a useEffect
+  useEffect(() => {
+    // Only redirect if we are fully loaded and definitely not authenticated
+    if (isMounted && !isAuthLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isAuthLoading, isMounted, router]);
 
   // 🛡️ THE SHIELD: If Next.js hasn't mounted, OR Firebase is still thinking, wait!
   if (!isMounted || isAuthLoading) {
@@ -36,9 +43,9 @@ export default function DashboardLayout({
   }
 
   // 1. Unauthenticated Guard
+  // If not authenticated, return null so the screen is blank while the useEffect redirects
   if (!isAuthenticated) {
-    router.push("/login");
-    return null;
+    return null; 
   }
 
   // 2. The Master RBAC Lock
@@ -52,12 +59,19 @@ export default function DashboardLayout({
     notFound();
   }
 
-  return (
-    <div className="flex min-h-screen">
+return (
+    // 🛠️ FIX 1: Lock the parent to exactly screen height and hide document scrolling
+    <div className="flex h-screen overflow-hidden"> 
+      
       <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <main className="flex-1 p-6 bg-slate-50 overflow-auto">{children}</main>
+      
+      {/* 🛠️ FIX 2: Force only the right-side container to handle vertical scrolling */}
+      <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+        <main className="flex-1 p-6">
+          {children}
+        </main>
       </div>
+      
       <ChatbotWidget />
       <Toaster />
     </div>

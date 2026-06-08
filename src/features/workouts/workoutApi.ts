@@ -1,34 +1,67 @@
-import { baseApi } from '@/store/baseApi';
+import { baseApi } from "@/store/baseApi";
 
 export const workoutApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getWorkouts: builder.query<unknown, void>({
-      query: () => '/workouts',
+      query: () => "/workouts",
     }),
+    // 🛠️ 1. ADD THIS NEW QUERY TO FETCH THE COACH'S PRESCRIPTION
+    getTodayPrescription: builder.query<any, void>({
+      query: () => "/workouts/today", // Ensure this matches the route you made in Express!
+      transformResponse: (response: any) => response.data,
+      providesTags: ["Workout"], // This ensures it refetches if a workout is completed
+    }),
+
+    getMyWorkoutsHistory: builder.query<any, void>({
+      query: () => "/workouts/history",
+      transformResponse: (response: any) => response.data,
+      providesTags: ["Workout"], // Automatically updates when they finish a new workout!
+    }),
+
     generateNextWorkout: builder.mutation<unknown, void>({
       query: () => ({
-        url: '/aiInsights/generate-workout',
-        method: 'POST',
+        url: "/aiInsights/generate-workout",
+        method: "POST",
       }),
     }),
+
     startWorkout: builder.mutation<unknown, unknown>({
       query: (body) => ({
-        url: '/workouts',
-        method: 'POST',
+        url: "/workouts",
+        method: "POST",
         body,
       }),
+      invalidatesTags: ["Workout"],
     }),
-    addExerciseToWorkout: builder.mutation<unknown, { workoutId: string; body: unknown }>({
+
+    completeWorkoutSession: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/workouts/complete",
+        method: "POST",
+        body,
+      }),
+      // This tells the UI to instantly refresh the History tab and the Dashboard
+      invalidatesTags: ["Workout", "Athlete"],
+    }),
+
+    addExerciseToWorkout: builder.mutation<
+      unknown,
+      { workoutId: string; body: unknown }
+    >({
       query: ({ workoutId, body }) => ({
         url: `/workouts/${workoutId}/exercises`,
-        method: 'POST',
+        method: "POST",
         body,
       }),
     }),
-    logSet: builder.mutation<unknown, { workoutExerciseId: string; body: unknown }>({
+
+    logSet: builder.mutation<
+      unknown,
+      { workoutExerciseId: string; body: unknown }
+    >({
       query: ({ workoutExerciseId, body }) => ({
         url: `/workouts/exercises/${workoutExerciseId}/sets`,
-        method: 'POST',
+        method: "POST",
         body,
       }),
     }),
@@ -36,10 +69,13 @@ export const workoutApi = baseApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { 
-  useGetWorkoutsQuery, 
-  useGenerateNextWorkoutMutation, 
+export const {
+  useGetTodayPrescriptionQuery,
+  useGetMyWorkoutsHistoryQuery,
+  useGetWorkoutsQuery,
+  useGenerateNextWorkoutMutation,
   useStartWorkoutMutation,
+  useCompleteWorkoutSessionMutation,
   useAddExerciseToWorkoutMutation,
-  useLogSetMutation
+  useLogSetMutation,
 } = workoutApi;
